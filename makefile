@@ -5,21 +5,22 @@ SHELL = /bin/sh
 CC=gcc
 ASMBIN=nasm
 
-all: link
+all: main.o mapa.o przekroj.o	
+	@echo "Linking..."; $(CC) -m32 -o bin -lstdc++ main.o mapa.o przekroj.o
 	@echo "Done, run with ./bin"
 
-link: main.o func.o
-	@echo "Linking..."; $(CC) -m32 -o bin -lstdc++ main.o func.o
+mapa.o: mapa.asm 
+	@echo "Compiling mapa.asm..."; $(ASMBIN) -g -f elf -l mapa.lst mapa.asm
 
-func.o: func.asm 
-	@echo "Compiling func.asm..."; $(ASMBIN) -g -f elf -l func.lst func.asm
+przekroj.o: przekroj.asm 
+	@echo "Compiling przekroj.asm..."; $(ASMBIN) -g -f elf -l przekroj.lst przekroj.asm
 
 main.o: main.cc
 	@echo "Compiling main.cc..."; $(CC) -m32 -c -g -O0 main.cc 
 
 clean:
-	@echo "Cleaning up..."
-	rm *.o
-	rm bin
-	rm func.lst
+	@echo "Removing executable...";rm bin 2>/dev/null || true
+	@echo "Cleaning up...";
+	@rm *.o 2>/dev/null || true
+	@rm *.lst 2>/dev/null || true
 	@echo "Done"
