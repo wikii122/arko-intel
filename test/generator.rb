@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 # Test generator for ARKO classes.
 
-@target = nil
+@target = "test.txt"
+@delta = 0
 
 ARGV.each do|a|
 	s = 0
@@ -14,6 +15,7 @@ ARGV.each do|a|
 		puts "Possible options"
 		puts "\t-h, --help\t Display this message."
 		puts "\t-u, --usage\tDisplay usage message."
+		puts "\t--min\t\tAdd value to every element."
 		puts "Functions available:"
 		puts "\t0\tVertical scope."
 		puts "\t1\tHorizontal scope."
@@ -26,16 +28,16 @@ ARGV.each do|a|
 		exit
 	elsif a == "-o"
 		s = 1
+	elsif a == "--min"
+		s = 2
 	elsif s == 1
 		s = 0
 		@target = a
+	elsif s == 2
+		@delta = a.to_i
 	else
 		@function = a.to_i
 	end
-
-end
-if @target == nil
-	@target = "test.txt"
 end
 
 array = []
