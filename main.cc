@@ -12,7 +12,6 @@ int main( int argc, char** argv )
 	int map[SIZE];
 	int value, range, indx, indy;
 	MapaStruct ms;
-	PrzekStruct ps;
 	BMPHeader header;
 	FILE* file;
 
@@ -41,8 +40,8 @@ int main( int argc, char** argv )
 		printf( "File parametry.txt does not exist." );
 		return 1;
 	}
-	fscanf( file, "%d %d", &ps.x1, &ps.y1 );
-	fscanf( file, "%d %d", &ps.x2, &ps.y2 );
+	fscanf( file, "%d %d", &ms.x1, &ms.y1 );
+	fscanf( file, "%d %d", &ms.x2, &ms.y2 );
 	fscanf( file, "%d", &ms.min );
 	fscanf( file, "%d", &ms.max );
 	fclose( file );
@@ -51,15 +50,14 @@ int main( int argc, char** argv )
 		printf( "Wrong parameters!" );
 		return 0;
 	}
-	ps.ms = &ms;
-	indx = ps.x2>ps.x1? ps.x2-ps.x1:ps.x1-ps.x2;
-	indy = ps.y2>ps.y1? ps.y2-ps.y1:ps.y1-ps.y2;
+	indx = ms.x2>ms.x1? ms.x2-ms.x1:ms.x1-ms.x2;
+	indy = ms.y2>ms.y1? ms.y2-ms.y1:ms.y1-ms.y2;
 	range = indx>indy? indx:indy;
 
 	unsigned char mapBMP[3 * SIZE];
 	mapa( map, mapBMP, &ms );
 	unsigned char interBMP[3*range*(ms.max-ms.min)];
-	przekroj( map, interBMP, &ps );
+	przekroj( map, interBMP, &ms );
 
 	file = fopen( argv[1], "w+" );
 	makeMapHeader( &header ); 
@@ -68,7 +66,7 @@ int main( int argc, char** argv )
 	fclose( file );
 
 	file = fopen( argv[2], "w+" );
-	makeInterHeader( &header, ps, range );
+	makeInterHeader( &header, ms, range );
 	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
 	fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
 	fclose( file );
