@@ -31,11 +31,16 @@ mapa:
 	cld					; Clear destination flag.
 loop1:
 	lodsd					; Load first number into accumulator.
-	mov	ebx,		dword [ebp-8]	; Load maximal value.
-	cmp	eax,		ebx		; Compare value with maximal
+	cmp	eax,		dword [ebp-8[	; Compare value with maximal
 	jge	put_black			; if higher than maximal, simply put black.
 	sub	eax,		dword [ebp-4]	; Substract minimal value from current.
 	js	put_white			; If result negative, simply put white.
+
+	; Calculate correct value if not special case.
+	mov	eax,		ebx		; Multiply value by 255 by
+	shl	eax,		8		; multiplying it by 256
+	sub	eax,		ebx		; and substracting original value once.
+	div	dword [ebp-12]			; Normalization of value to 255.
 
 loop1_continue:
 	stosd					; Store result value
