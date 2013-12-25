@@ -58,7 +58,8 @@ int main( int argc, char** argv )
 
 	unsigned char mapBMP[3 * SIZE];
 	mapa( map, mapBMP, &ms );
-	unsigned char interBMP[3*range*(ms.max-ms.min)];
+	int len = 3*range*(ms.max-ms.min);
+	unsigned char interBMP[len];
 	//przekroj( map, interBMP, &ms );
 
 	printf( "%s", argv[1] );

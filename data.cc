@@ -57,4 +57,5 @@ int makeMapHeader( BMPHeader* header )
 int makeInterHeader( BMPHeader* header, PrzekStruct ps, int range )
 {
 	// TODO
+	return 0;
 }
