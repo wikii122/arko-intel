@@ -35,7 +35,7 @@ int makeMapHeader( BMPHeader* header )
 {
 	header->bfType[0] = 'B';
 	header->bfType[1] = 'M';
-	header->bfSize = 121458;
+	header->bfSize = 121458; // TODO: Check.
 	header->bfReserved1 = 0;
 	header->bfReserved2 = 0;
 	header->bfOffBits = 56; // TODO: Check.

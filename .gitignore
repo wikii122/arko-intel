@@ -1,3 +1,5 @@
 bin
 *.o
 *.lst
+mapa.txt
+parametry.txt

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "data.cc"
 #define SIZE 201*201
 #define SINGLE 1
@@ -11,6 +12,7 @@ int main( int argc, char** argv )
 {
 	int map[SIZE];
 	int value, range, indx, indy;
+	char filename[20];
 	MapaStruct ms;
 	BMPHeader header;
 	FILE* file;
@@ -57,19 +59,21 @@ int main( int argc, char** argv )
 	unsigned char mapBMP[3 * SIZE];
 	mapa( map, mapBMP, &ms );
 	unsigned char interBMP[3*range*(ms.max-ms.min)];
-	przekroj( map, interBMP, &ms );
+	//przekroj( map, interBMP, &ms );
 
-	file = fopen( argv[1], "w+" );
+	printf( "%s", argv[1] );
+	strcpy( filename, argv[1] );
+	file = fopen( filename, "w+" );
 	makeMapHeader( &header ); 
 	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
 	fwrite( &mapBMP, PIXEL_SIZE, SIZE, file );
 	fclose( file );
 
-	file = fopen( argv[2], "w+" );
-	makeInterHeader( &header, ms, range );
-	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
-	fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
-	fclose( file );
+	//file = fopen( argv[2], "w+" );
+	//makeInterHeader( &header, ms, range );
+	//fwrite( &header, sizeof(BMPHeader), SINGLE, file );
+	//fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
+	//fclose( file );
 
 	return 0;
 }
