@@ -80,6 +80,28 @@ draw_by_x:
 draw_by_y:
 	
 ; TODO: Swap rows.
+swap:
+	mov	esi,		dword [ebp+12]	; Load beginning of the file
+	mov	edi,		esi		; Copy it to the second register
+	; TODO replace with lea
+	add	edi,		201*200*3	; Set address to correct value
+loop2:
+	mov	ecx,		3*201		; Set loop counter.
+	cmp	edi,		esi		; Compare addresses
+	jle	epilogue			; If edi is less than esi, finished. All swapped.
+loop3:
+	movzx	eax,		byte [esi]	; Load first
+	movzx	ebx,		byte [edi]	; and second byte.
+	; TODO: Change too full registers. 
+	mov	byte [edi],	al		; Swap them,
+	mov	byte [esi],	bl		; finish swap.
+	inc 	edi,				; Advance to next byte
+	inc	esi,				; in both addresses,
+	loop	loop3				; and continue loop.
+
+	sub	edi,		6*201		; EDI points one row higher now, so decrementing it by row is in practice decrementing it by 2 rows.
+	jmp	loop2
+
 epilogue:
 	mov	eax, 		0		; Return 0.
 

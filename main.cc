@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include "data.cc"
 #define SIZE 201*201
 #define SINGLE 1
@@ -62,8 +61,6 @@ int main( int argc, char** argv )
 	unsigned char interBMP[len];
 	//przekroj( map, interBMP, &ms );
 
-	printf( "%s", argv[1] );
-	strcpy( filename, argv[1] );
 	file = fopen( filename, "w+" );
 	makeMapHeader( &header ); 
 	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
