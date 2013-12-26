@@ -48,16 +48,15 @@ put_byte:
 loop1:
 	lodsd					; Load first number into accumulator.
 	cmp	eax,		dword [ebp-8]	; Compare value with maximal
-	jge	put_black			; if higher than maximal, simply put black.
+	jg	put_white			; if higher than maximal, simply put black.
 	sub	eax,		dword [ebp-4]	; Substract minimal value from current.
-	js	put_white			; If result negative, simply put white.
+	js	put_black			; If result negative, simply put white.
 
 	; Calculate correct value if not special case.
 	push	ebx				; Store row counter
-	mov	eax,		ebx		; Multiply value by 255 by
-	shl	eax,		8		; multiplying it by 256
-	sub	eax,		ebx		; and substracting original value once.
-	div	dword [ebp-12]			; Normalization of value to 255.
+	mov	ebx,		255
+	mul	ebx,				; Normalization of value to 255.
+	div	dword [ebp-12]
 	pop	ebx				; Restore row counter.
 
 loop1_continue:
@@ -68,17 +67,17 @@ loop1_continue:
 	inc	ebx				; Increment row counter.
 	cmp	ebx,		201		; Check if empty byte should be given.
 	je	put_byte			; Put one byte at the end of row.
+
 put_byte_ret:
 	loop	loop1				; Decrement loop counter and jump loop1 if nonzero.
-	jmp	epilogue
 
 ; Swap rows.
 	mov	esi,		dword [ebp+12]	; Load beginning of the file
 	mov	edi,		esi		; Copy it to the second register
 	; TODO replace with lea
-	add	edi,		201*200*3	; Set address to correct value
+	add	edi,		200*(201*3+1)	; Set address to correct value
 loop2:
-	mov	ecx,		3*201		; Set loop counter.
+	mov	ecx,		3*201+1		; Set loop counter.
 	cmp	edi,		esi		; Compare addresses
 	jle	epilogue			; If edi is less than esi, finished. All swapped.
 loop3:
@@ -91,7 +90,7 @@ loop3:
 	inc	esi,				; in both addresses,
 	loop	loop3				; and continue loop.
 
-	sub	edi,		6*201		; EDI points one row higher now, so decrementing it by row is in practice decrementing it by 2 rows.
+	sub	edi,		6*201+2		; EDI points one row higher now, so decrementing it by row is in practice decrementing it by 2 rows.
 	jmp	loop2
 
 epilogue:

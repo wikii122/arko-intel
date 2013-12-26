@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "data.cc"
-#define SIZE 201*201
+#define SIZE 202*201
 #define SINGLE 1
 #define PIXEL_SIZE 3
 
