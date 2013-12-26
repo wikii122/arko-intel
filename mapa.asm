@@ -44,6 +44,7 @@ put_byte:
 	mov	ebx,		0		; Prepare byte to store
 	mov	byte [edi],	0x13		; Store new byte.
 	inc	edi				; Correct address
+	jmp	put_byte_ret			; Return after if stamenment.
 loop1:
 	lodsd					; Load first number into accumulator.
 	cmp	eax,		dword [ebp-8]	; Compare value with maximal
@@ -62,9 +63,10 @@ loop1_continue:
 	mov	byte [edi+1],	al		; three times,
 	mov	byte [edi+2],	al		; once for each color.
 	add	edi,		3		; and increment target counter.
-	cmp	ebx,		200		; Check if empty byte should be given.
-	je	put_byte			; Put one byte at the end of row.
 	inc	ebx				; Increment row counter.
+	cmp	ebx,		201		; Check if empty byte should be given.
+	je	put_byte			; Put one byte at the end of row.
+put_byte_ret:
 	loop	loop1				; Decrement loop counter and jump loop1 if nonzero.
 	jmp	epilogue
 
