@@ -28,6 +28,7 @@ mapa:
 	mov	ecx,		201*201		; Load loop counter
 	mov	esi,		dword [ebp+8]	; Load source address.
 	mov	edi,		dword [ebp+12]	; Load destination address.
+	mov	ebx,		0		; Zero row counter.
 	cld					; Clear destination flag.
 	jmp	loop1				; jump to the loop.
 
@@ -39,9 +40,12 @@ put_white:
 	mov	eax,		-1		; Store 1s
 	jmp	loop1_continue			; Continue loop.
 
+put_byte:
+	mov	ebx,		0		; Prepare byte to store
+	mov	byte [edi],	0x13		; Store new byte.
+	inc	edi				; Correct address
 loop1:
 	lodsd					; Load first number into accumulator.
-debug:
 	cmp	eax,		dword [ebp-8]	; Compare value with maximal
 	jge	put_black			; if higher than maximal, simply put black.
 	sub	eax,		dword [ebp-4]	; Substract minimal value from current.
@@ -58,29 +62,13 @@ loop1_continue:
 	mov	byte [edi+1],	al		; three times,
 	mov	byte [edi+2],	al		; once for each color.
 	add	edi,		3		; and increment target counter.
+	cmp	ebx,		200		; Check if empty byte should be given.
+	je	put_byte			; Put one byte at the end of row.
+	inc	ebx				; Increment row counter.
 	loop	loop1				; Decrement loop counter and jump loop1 if nonzero.
-;TODO: remove
 	jmp	epilogue
-	; Now draw red line.
-	mov	eax,		dword [ebx+20]	; Load first value for y.
-	sub	eax,		dword [ebx+16]	; Count y length of line.
-	mov	dword [ebp-8],	eax		; Store result
 
-	mov	ebx,		dword [ebp+8]	; Load data struct address.
-	mov	eax,		dword [ebx+12]	; Load first value for x.
-	sub	eax,		dword [ebp+8]	; Count x length of line.
-	mov	dword [ebp-4],	eax		; Store result
-	idiv	dword [ebp-8]			; Count tangens of the line.
-
-	cmp	eax,		1		; If tangens is greater or equal than 1,
-	jge	draw_by_y			; Line should be drawn by ys.
-	cmp	eax,		-1		; else if tangens
-	jl	draw_by_y			; is less than -1, the also draw by ys.
-draw_by_x:
-draw_by_y:
-	
-; TODO: Swap rows.
-swap:
+; Swap rows.
 	mov	esi,		dword [ebp+12]	; Load beginning of the file
 	mov	edi,		esi		; Copy it to the second register
 	; TODO replace with lea
