@@ -63,6 +63,7 @@ int main( int argc, char** argv )
 	file = fopen( "mapa.bmp", "w+" );
 	makeMapHeader( &header ); 
 	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
+	fseek( file, sizeof(BMPHeader), SEEK_SET );
 	fwrite( &mapBMP, PIXEL_SIZE, SIZE, file );
 	fclose( file );
 
