@@ -53,10 +53,12 @@ loop1:
 	js	put_white			; If result negative, simply put white.
 
 	; Calculate correct value if not special case.
+	push	ebx				; Store row counter
 	mov	eax,		ebx		; Multiply value by 255 by
 	shl	eax,		8		; multiplying it by 256
 	sub	eax,		ebx		; and substracting original value once.
 	div	dword [ebp-12]			; Normalization of value to 255.
+	pop	ebx				; Restore row counter.
 
 loop1_continue:
 	mov	byte [edi],	al		; Save result
