@@ -10,6 +10,8 @@ struct MapaStruct{
 
 typedef MapaStruct PrzekStruct;
 
+#pragma pack(push)
+#pragma pack(1)
 typedef
 struct BMPHeader {
 	unsigned char bfType[2];
@@ -29,16 +31,16 @@ struct BMPHeader {
 	unsigned int biClrUsed;
 	unsigned int biClrImportant;
 } BMPHeader;
-
+#pragma pack(pop)
 
 int makeMapHeader( BMPHeader* header )
 {
 	header->bfType[0] = 'B';
 	header->bfType[1] = 'M';
-	header->bfSize = 121458; // TODO: Check.
+	header->bfSize = sizeof(BMPHeader) + (3*201*201); // TODO: Check.
 	header->bfReserved1 = 0;
 	header->bfReserved2 = 0;
-	header->bfOffBits = 56; // TODO: Check.
+	header->bfOffBits = sizeof(BMPHeader); // TODO: Check.
 	header->biSize = 40;
 	header->biWidth = 201;
 	header->biHeigth = 201;
