@@ -11,16 +11,15 @@ int main( int argc, char** argv )
 {
 	int map[SIZE];
 	int value, range, indx, indy;
-	char filename[20];
 	MapaStruct ms;
 	BMPHeader header;
 	FILE* file;
 
-	if( argc != 3 )
-	{
-		printf( "Usage:\n\tbin map intersection\n" );
-		return 0;
-	}
+	//if( argc != 1 )
+	//{
+	//	printf( "Usage:\n\tbin map intersection\n" );
+	//	return 0;
+	//}
 	
 	file = fopen( "mapa.txt", "r" );
 	if( file==NULL )
@@ -61,13 +60,13 @@ int main( int argc, char** argv )
 	unsigned char interBMP[len];
 	//przekroj( map, interBMP, &ms );
 
-	file = fopen( filename, "w+" );
+	file = fopen( "mapa.bmp", "w+" );
 	makeMapHeader( &header ); 
 	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
 	fwrite( &mapBMP, PIXEL_SIZE, SIZE, file );
 	fclose( file );
 
-	//file = fopen( argv[2], "w+" );
+	//file = fopen( "przekroj.bmp", "w+" );
 	//makeInterHeader( &header, ms, range );
 	//fwrite( &header, sizeof(BMPHeader), SINGLE, file );
 	//fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
