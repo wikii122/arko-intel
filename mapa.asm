@@ -67,14 +67,104 @@ loop1_continue:
 	inc	ebx				; Increment row counter.
 	cmp	ebx,		201		; Check if empty byte should be given.
 	je	put_byte			; Put one byte at the end of row.
-
 put_byte_ret:
 	loop	loop1				; Decrement loop counter and jump loop1 if nonzero.
 
-; Swap rows.
+	; Draw line.
+draw:
+	mov	ebx,		dword [ebp+16]	; Load address of help struct.
+	; Calculate start of line.
+	mov	eax,		dword [ebx+16]	; Load x start.
+	mov	ebx,		dword [ebp+12]	; Load start of map.
+	mov	ecx,		604		; Store multiply value
+	mul	ecx				; Multiply by value
+	push	eax				; Store result on stack
+	mov	ebx,		dword [ebp+16]	; Load address of help struct.
+	mov	eax,		dword [ebx+8]	; Load y start.
+	mov	ebx,		dword [ebp+12]	; Load start of map.
+	mov	edx,		0		; Now multiply by
+	mov	ecx,		3		; 3 taking care y offset
+	mul	ecx				; multiply.
+	pop	edx				; Restore saved value.
+	lea	ebx,		[ebx+eax]	; Load address of starting position.
+	lea	ebx,		[ebx+edx]
+	; Current eax is address of [map start]+(3*201+1)*[y start]+3*[x start]
+	push	ebx				; Store address of starting position.
+
+	mov	ebx,		dword [ebp+16]	; Load address of help struct.
+	mov	eax,		dword [ebx+8]	; Load x start.
+	sub	eax,		dword [ebx+12]	; Count x length.
+	jns	draw_positive_x			; If less than 0
+	neg	eax				; negate length,
+draw_positive_x:				; else continue.
+	mov 	edx,		eax		; Backup x lengthv in edx.
+	mov	eax,		dword [ebx+16]	; Load y start
+	sub	eax,		dword [ebx+20]	; and count y length.
+	jns	draw_positive_y			; If less than 0
+	neg	eax				; negate length,
+draw_positive_y:				; else continue.
+	mov	dword [ebp-8],	eax		; Store length of y.
+	mov	dword [ebp-4],	edx		; Store length of x.
+	cmp	eax,		edx		; Compare x and y length,
+	jge	draw_by_y			; if length of x is greater, draw by y.
+
+draw_by_x:
+	mov	ecx,		0		; Zero the loop counter.
+	mov	dword [ebp-12],	3		; Store move indicator.
+	pop	ebx				; Restore starting position.
+	mov	eax,		ebx
+	mov	edx,		dword [ebx+16]	; Load x1 value.
+	sub	edx,		dword [ebx+20]	; Count length again.
+	jns	draw_by_x_pos			; If length is negative, change move indicator.
+	mov	dword [ebp-12],	-3		; to -one row.
+
+draw_by_x_pos:
+	mov	byte [eax],	0		; Store blue.
+	mov	byte [eax+1],	0		; Store green.
+	mov	byte [eax+2],	-1		; Store red.
+	inc	ecx				; Increment loop counter
+	mov	eax,		ecx		; Copy value of eax to further calculation.
+	imul	dword [ebp-4]			; Calculate new y using proportion
+	idiv	dword [ebp-8]			; of original x/y.
+	add	ebx,		dword [ebp-12]	; Increment pointer by value.
+	lea	eax,		[eax*4-eax]	; Count y offset.
+	lea	eax,		[ebx+ebx]	; Add y offset to new address.
+	cmp	ecx,		dword [ebp-8]	; Check if
+	jle	draw_by_x_pos			; loop is finished.
+	jmp	swap				; Continue running.
+
+draw_by_y:
+	mov	ecx,		0		; Zero the loop counter.
+	mov	dword [ebp-12],	-(3*201+1)	; Store move indicator.
+	pop	ebx				; Restore starting position.
+	mov	eax,		ebx		; Copy ebx to eax, for future use.
+	mov	edx,		dword [ebx+16]	; Load x1 value.
+	sub	edx,		dword [ebx+20]	; Count length again.
+	jns	draw_by_y_pos			; If length is negative, change move indicator.
+	mov	dword [ebp-12],	(3*201+1)	; to -one row.
+
+draw_by_y_pos:
+	mov	byte [eax],	0		; Store blue.
+	mov	byte [eax+1],	0		; Store green.
+	mov	byte [eax+2],	-1		; Store red.
+	inc	ecx				; Increment loop counter
+	mov	eax,		ecx		; Copy value of eax to further calculation.
+	mul	dword [ebp-4]			; Calculate new y using proportion
+	div	dword [ebp-8]			; of original x/y.
+	add	ebx,		dword [ebp-12]	; Increment pointer by value.
+	push	ebx
+	mov	ebx,		3
+	imul	ebx
+	pop	ebx
+	add	eax,		ebx
+	cmp	ecx,		dword [ebp-8]	; Check if
+	jle	draw_by_y_pos			; loop is finished.
+	jmp	swap				; Continue running.
+
+	; Swap rows.
+swap:
 	mov	esi,		dword [ebp+12]	; Load beginning of the file
 	mov	edi,		esi		; Copy it to the second register
-	; TODO replace with lea
 	add	edi,		200*(201*3+1)	; Set address to correct value
 loop2:
 	mov	ecx,		3*201+1		; Set loop counter.
@@ -115,10 +205,10 @@ epilogue:
 ;  -------------------------------
 ;  | saved ebp                   | EBP
 ;  -------------------------------
-;  | minimal value, x diff       | EBP-4
+;  | minimal value, x start      | EBP-4
 ;  -------------------------------
-;  | maximal value, y diff       | EBP-8
+;  | maximal value, y start      | EBP-8
 ;  -------------------------------
-;  | delta between min and max   | EBP-12
+;  | delta min-max, difference   | EBP-12
 ;  -------------------------------
 ;============================================
