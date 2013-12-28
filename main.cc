@@ -58,7 +58,7 @@ int main( int argc, char** argv )
 	mapa( map, mapBMP, &ms );
 	int len = 3*range*(ms.max-ms.min);
 	unsigned char interBMP[len];
-	//przekroj( map, interBMP, &ms );
+	przekroj( map, interBMP, &ms );
 
 	file = fopen( "mapa.bmp", "w+" );
 	makeMapHeader( &header ); 
@@ -67,11 +67,11 @@ int main( int argc, char** argv )
 	fwrite( &mapBMP, PIXEL_SIZE, SIZE, file );
 	fclose( file );
 
-	//file = fopen( "przekroj.bmp", "w+" );
-	//makeInterHeader( &header, ms, range );
-	//fwrite( &header, sizeof(BMPHeader), SINGLE, file );
-	//fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
-	//fclose( file );
+	file = fopen( "przekroj.bmp", "w+" );
+	makeInterHeader( &header, ms, range );
+	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
+	fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
+	fclose( file );
 
 	return 0;
 }
