@@ -112,13 +112,43 @@ draw_by_x:
 	mov	ecx,		0		; Zero the loop counter.
 	mov	dword [ebp-12],	3		; Store move indicator.
 	pop	ebx				; Restore starting position.
-	mov	eax,		ebx
-	mov	edx,		dword [ebx+16]	; Load x1 value.
-	sub	edx,		dword [ebx+20]	; Count length again.
-	jns	draw_by_x_pos			; If length is negative, change move indicator.
+	mov	eax,		ebx		; Copy ebx to eax, for future use.
+	mov	esi,		dword [ebp+16]	; Load help struct.
+	mov	edx,		dword [esi+8]	; Load x1 value.
+	sub	edx,		dword [esi+12]	; Count length again.
+	js	draw_by_x_pos			; If length is negative, change move indicator.
 	mov	dword [ebp-12],	-3		; to -one row.
 
 draw_by_x_pos:
+	mov	byte [eax],	0		; Store blue.
+	mov	byte [eax+1],	0		; Store green.
+	mov	byte [eax+2],	-1		; Store red.
+	inc	ecx				; Increment loop counter
+	add	ebx,		dword [ebp-12]	; Increment pointer by value.
+	push	ebx				; Store array address.
+	mov	eax,		ecx		; Copy value of eax to further calculation.
+	imul	dword [ebp-8]			; Calculate new y using proportion
+	idiv	dword [ebp-4]			; of original x/y.
+	mov	ebx,		(3*201+1)	; Count y offset.
+	imul	ebx				; by multiplying by number of bytes in row.
+	pop	ebx				; Restore original address.
+	add	eax,		ebx		; Count new position.
+	cmp	ecx,		dword [ebp-4]	; Check if
+	jle	draw_by_x_pos			; loop is finished.
+	jmp	swap				; Continue running.
+
+draw_by_y:
+	mov	ecx,		0		; Zero the loop counter.
+	mov	dword [ebp-12],	(3*201+1)	; Store move indicator.
+	pop	ebx				; Restore starting position.
+	mov	eax,		ebx		; Copy ebx to eax, for future use.
+	mov	esi,		dword [ebp+16]	; Load help struct.
+	mov	edx,		dword [esi+16]	; Load y1 value.
+	sub	edx,		dword [esi+20]	; Count length again.
+	js	draw_by_y_pos			; If length is negative, change move indicator.
+	mov	dword [ebp-12],	-(3*201+1)	; to -one row.
+
+draw_by_y_pos:
 	mov	byte [eax],	0		; Store blue.
 	mov	byte [eax+1],	0		; Store green.
 	mov	byte [eax+2],	-1		; Store red.
@@ -127,36 +157,11 @@ draw_by_x_pos:
 	imul	dword [ebp-4]			; Calculate new y using proportion
 	idiv	dword [ebp-8]			; of original x/y.
 	add	ebx,		dword [ebp-12]	; Increment pointer by value.
-	lea	eax,		[eax*4-eax]	; Count y offset.
-	lea	eax,		[ebx+ebx]	; Add y offset to new address.
-	cmp	ecx,		dword [ebp-8]	; Check if
-	jle	draw_by_x_pos			; loop is finished.
-	jmp	swap				; Continue running.
-
-draw_by_y:
-	mov	ecx,		0		; Zero the loop counter.
-	mov	dword [ebp-12],	-(3*201+1)	; Store move indicator.
-	pop	ebx				; Restore starting position.
-	mov	eax,		ebx		; Copy ebx to eax, for future use.
-	mov	edx,		dword [ebx+16]	; Load x1 value.
-	sub	edx,		dword [ebx+20]	; Count length again.
-	jns	draw_by_y_pos			; If length is negative, change move indicator.
-	mov	dword [ebp-12],	(3*201+1)	; to -one row.
-
-draw_by_y_pos:
-	mov	byte [eax],	0		; Store blue.
-	mov	byte [eax+1],	0		; Store green.
-	mov	byte [eax+2],	-1		; Store red.
-	inc	ecx				; Increment loop counter
-	mov	eax,		ecx		; Copy value of eax to further calculation.
-	mul	dword [ebp-4]			; Calculate new y using proportion
-	div	dword [ebp-8]			; of original x/y.
-	add	ebx,		dword [ebp-12]	; Increment pointer by value.
-	push	ebx
-	mov	ebx,		3
-	imul	ebx
-	pop	ebx
-	add	eax,		ebx
+	push	ebx				; Store original position
+	mov	ebx,		3		; Calculate x offset
+	imul	ebx				; by multiplaying offset by number of bytes per color.
+	pop	ebx				; Restore the originaladdress.
+	add	eax,		ebx		; Count address with offset in eax.
 	cmp	ecx,		dword [ebp-8]	; Check if
 	jle	draw_by_y_pos			; loop is finished.
 	jmp	swap				; Continue running.
