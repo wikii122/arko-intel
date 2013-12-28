@@ -109,6 +109,21 @@ draw_positive_y:				; else continue.
 	jge	draw_by_y			; if length of x is greater, draw by y.
 
 draw_by_x:
+	mov	ebx,		dword [ebp+16]	; Load help struct.
+	mov	eax,		dword [ebx+8]	; Load x1
+	sub	eax,		dword [ebx+12]	; Count length of x.
+	js	draw_by_x_x_neg			; If x negative, consider separate case.
+draw_by_x_x_pos:				; else
+	mov	eax,		dword [ebx+16]	; Load y1
+	sub	eax,		dword [ebx+20]	; Count y length.
+	mov	dword [ebp-8],	eax		; and store it as length of y.
+	jmp	draw_by_x_continue		; Then continue.
+draw_by_x_x_neg:				; else
+	mov	eax,		dword [ebx+16]	; Load y1
+	sub	eax,		dword [ebx+20]	; Count y length.
+	neg	eax				; else negate eax
+	mov	dword [ebp-8],	eax		; and store it as length of y.
+draw_by_x_continue:
 	mov	ecx,		0		; Zero the loop counter.
 	mov	dword [ebp-12],	3		; Store move indicator.
 	pop	ebx				; Restore starting position.
@@ -118,7 +133,6 @@ draw_by_x:
 	sub	edx,		dword [esi+12]	; Count length again.
 	js	draw_by_x_pos			; If length is negative, change move indicator.
 	mov	dword [ebp-12],	-3		; to -one row.
-
 draw_by_x_pos:
 	mov	byte [eax],	0		; Store blue.
 	mov	byte [eax+1],	0		; Store green.
@@ -138,6 +152,21 @@ draw_by_x_pos:
 	jmp	swap				; Continue running.
 
 draw_by_y:
+	mov	ebx,		dword [ebp+16]	; Load help struct.
+	mov	eax,		dword [ebx+16]	; Load x1
+	sub	eax,		dword [ebx+20]	; Count length of x.
+	js	draw_by_y_y_neg			; If x negative, consider separate case.
+draw_by_y_y_pos:				; else
+	mov	eax,		dword [ebx+8]	; Load y1
+	sub	eax,		dword [ebx+12]	; Count y length.
+	mov	dword [ebp-4],	eax		; and store it as length of y.
+	jmp	draw_by_y_continue		; Then continue.
+draw_by_y_y_neg:				; else
+	mov	eax,		dword [ebx+8]	; Load y1
+	sub	eax,		dword [ebx+12]	; Count y length.
+	neg	eax				; else negate eax
+	mov	dword [ebp-4],	eax		; and store it as length of y.
+draw_by_y_continue:
 	mov	ecx,		0		; Zero the loop counter.
 	mov	dword [ebp-12],	(3*201+1)	; Store move indicator.
 	pop	ebx				; Restore starting position.
