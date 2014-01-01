@@ -56,7 +56,8 @@ int main( int argc, char** argv )
 
 	unsigned char mapBMP[3 * SIZE];
 	mapa( map, mapBMP, &ms );
-	int len = 3*range*(ms.max-ms.min);
+	int len = 3*400*range;
+	ms.min = range;
 	unsigned char interBMP[len];
 	przekroj( map, interBMP, &ms );
 
@@ -70,7 +71,8 @@ int main( int argc, char** argv )
 	file = fopen( "przekroj.bmp", "w+" );
 	makeInterHeader( &header, ms, range );
 	fwrite( &header, sizeof(BMPHeader), SINGLE, file );
-	fwrite( &interBMP, PIXEL_SIZE, range*(ms.max-ms.min), file );
+	fseek( file, sizeof(BMPHeader), SEEK_SET );
+	fwrite( &interBMP, PIXEL_SIZE, range*400, file );
 	fclose( file );
 
 	return 0;

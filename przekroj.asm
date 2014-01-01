@@ -12,10 +12,27 @@ przekroj:
 	;prologue
 	push	ebp
 	mov	ebp,		esp
-	sub	esp,		4
+	mov	ebx,		4
+	sub	esp,		ebx
+	push	ebx
 
 	;body
 	; Prepare bitmap.
+	mov	edx,		0		; Zoro edx (multiplication).
+	mov	ebx,		dword [ebp+16]	; Load help struct.
+	mov	edi,		dword [ebp+12]	; Load target struct.
+	mov	ecx,		dword [ebx]	; Load length of line.
+	shl	ecx,		2		; Round two four bytes
+	inc	ecx				; and move two next byte
+	shr	ecx,		2		; 
+	mov	eax,		400*3		; Constant heigth * bit per pixel.
+	mul	ecx				; Count number of bits in bitmap.
+	mov	ecx,		eax		; Set number of bits as loop counter.
+	mov	eax,		-1		; Fill eax with 1s.
+loop_init:
+	stosb					; Store 1s in data array.
+	loop	loop_init			; Continue for every byte.
+
 	mov	ebx,		dword [ebp+16]	; Load help struct.
 	mov	eax,		dword [ebx+8]	; Load x1
 	sub	eax,		dword [ebx+12]	; Count length of x
@@ -31,10 +48,13 @@ y_positive:
 	pop	edx				; Restore x length.
 	cmp	eax,		edx		; Compare lengths
 
+
 end:
 	;epilogue
 	mov	eax, 	0			; Return 0
 
+	pop	ebx
+	add	esp, 	ebx
 	pop	ebp
 	ret
 
