@@ -6,7 +6,7 @@ CC=gcc
 ASMBIN=nasm
 
 CC_FLAG= -m32 -c -g -O0 -Wall 
-LINKER_FLAG=-m32 -lstdc++
+LINKER_FLAG=-m32 -lm -lstdc++
 ASM_FLAG=-g -f elf
 
 all: main.o mapa.o przekroj.o	

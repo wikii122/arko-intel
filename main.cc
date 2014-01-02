@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include "data.cc"
 #define SIZE 202*201
 #define SINGLE 1
@@ -10,7 +11,7 @@ extern "C" int przekroj( int* mapa,  unsigned char* image, PrzekStruct* przek );
 int main( int argc, char** argv )
 {
 	int map[SIZE];
-	int value, range, indx, indy;
+	int value, range;
 	MapaStruct ms;
 	BMPHeader header;
 	FILE* file;
@@ -50,9 +51,9 @@ int main( int argc, char** argv )
 		printf( "Wrong parameters!" );
 		return 0;
 	}
-	indx = ms.x2>ms.x1? ms.x2-ms.x1:ms.x1-ms.x2;
-	indy = ms.y2>ms.y1? ms.y2-ms.y1:ms.y1-ms.y2;
-	range = indx>indy? indx:indy;
+	range = pow((double)(ms.x2 - ms.x1), 2.0) + pow((double)(ms.y2 - ms.y1), 2.0);
+	range = sqrt( range );
+	if(!range) range = 1;
 
 	unsigned char mapBMP[3 * SIZE];
 	mapa( map, mapBMP, &ms );
